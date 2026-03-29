@@ -2,12 +2,26 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::pubkey::Pubkey;
 
 /// 用户配置文件数据结构
+///
+/// # 数据存储
+/// 这个结构体会被序列化后存储在账户的data字段中：
+/// Account.data = serialize(UserProfile)
+///
+/// # Owner字段说明
+/// 这里的owner是数据层面的owner，表示这个配置文件属于哪个用户。
+/// 不要与Account.owner混淆：
+/// - Account.owner = program_id（账户层面，控制账户访问）
+/// - UserProfile.owner = user_pubkey（数据层面，控制数据权限）
 #[derive(BorshSerialize, BorshDeserialize, Debug, PartialEq, Clone)]
 pub struct UserProfile {
     /// 是否已初始化
     pub is_initialized: bool,
-    /// 配置文件所有者
+
+    /// 配置文件所有者（数据层面的owner）
+    /// 这个字段存储在账户data中，用于权限验证
+    /// 只有这个owner才能更新/删除配置文件
     pub owner: Pubkey,
+
     /// 用户名（固定32字节）
     pub name: [u8; 32],
     /// 实际名字长度

@@ -35,6 +35,22 @@ pub fn process_instruction(
 }
 
 /// 处理创建配置文件指令
+///
+/// # 数据存储位置
+/// 数据存储在账户的data字段中：profile_info.data
+///
+/// # 两层Owner概念
+/// 1. 账户层面的owner (Account.owner)：
+///    - 这是Solana账户模型的owner字段
+///    - 表示哪个程序拥有这个账户的控制权
+///    - 只有owner程序才能修改账户的data
+///    - 在create时必须验证：profile_info.owner == program_id
+///
+/// 2. 数据层面的owner (UserProfile.owner)：
+///    - 这是业务逻辑中的owner字段
+///    - 表示这个配置文件属于哪个用户
+///    - 用于权限控制：只有数据owner才能更新/删除
+///    - 存储在账户data中的UserProfile结构里
 fn process_create_profile(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
@@ -59,19 +75,26 @@ fn process_create_profile(
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    // 验证配置文件账户所有者是程序
+    // 【账户层面的owner验证】
+    // 验证这个账户的owner字段是否为当前程序
+    // 这是必须的，因为只有owner程序才能写入账户的data字段
+    // 此时账户已经通过System Program创建，owner应该已经设置为program_id
     if profile_info.owner != program_id {
         msg!("错误: 配置文件账户所有者必须是程序");
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    // 创建配置文件数据
+    // 【数据层面的owner设置】
+    // 创建UserProfile数据结构，将payer设置为数据的owner
+    // 这个owner存储在账户data中，用于后续的权限验证
     let profile = UserProfile::new(*payer_info.key, name, age, email).map_err(|e| {
         msg!("数据验证失败: {}", e);
         ProgramError::InvalidInstructionData
     })?;
 
-    // 序列化并写入账户
+    // 【数据存储】
+    // 将UserProfile序列化后写入账户的data字段
+    // 这就是数据的实际存储位置：profile_info.data
     profile.serialize(&mut &mut profile_info.data.borrow_mut()[..])?;
 
     msg!("配置文件创建成功");
@@ -79,6 +102,16 @@ fn process_create_profile(
 }
 
 /// 处理更新配置文件指令
+///
+/// # 为什么这里验证数据owner而不是账户owner？
+/// 因为：
+/// 1. 账户层面的owner肯定是program_id（否则我们无法读取data）
+/// 2. 这里需要验证的是业务权限：谁有权修改这个配置文件？
+/// 3. 答案是：UserProfile.owner（数据的创建者）
+///
+/// # 两层owner的作用
+/// - Account.owner = program_id  → 程序控制账户
+/// - UserProfile.owner = user_pubkey → 用户控制数据
 fn process_update_profile(
     accounts: &[AccountInfo],
     name: Option<String>,
@@ -95,7 +128,8 @@ fn process_update_profile(
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    // 反序列化配置文件数据
+    // 【从账户data中读取数据】
+    // 反序列化存储在profile_info.data中的UserProfile数据
     let mut profile = UserProfile::try_from_slice(&profile_info.data.borrow())?;
 
     // 验证配置文件已初始化
@@ -104,7 +138,9 @@ fn process_update_profile(
         return Err(ProgramError::UninitializedAccount);
     }
 
-    // 验证所有者权限
+    // 【数据层面的owner验证】
+    // 验证调用者是否是UserProfile的owner（数据创建者）
+    // 这是业务逻辑层面的权限控制
     if profile.owner != *owner_info.key {
         msg!("错误: 只有所有者可以更新配置文件");
         return Err(ProgramError::IllegalOwner);

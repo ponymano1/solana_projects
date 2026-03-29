@@ -18,18 +18,17 @@
 ```
 XX-topic-name/
 ├── Cargo.toml
-├── README.md
+├── README.md (包含所有文档内容)
 ├── src/
 │   ├── lib.rs
 │   ├── instruction.rs (可选)
 │   ├── state.rs (可选)
 │   └── error.rs (可选)
-├── tests/
-│   └── integration.rs
-└── docs/
-    ├── CONCEPTS.md
-    └── EXERCISES.md (可选)
+└── tests/
+    └── integration.rs
 ```
+
+**注意：** 所有文档内容（概念讲解、练习等）已整合到单个README.md中，不再使用独立的docs/目录。
 
 ### Cargo.toml模板
 ```toml
@@ -64,7 +63,7 @@ tokio = "1"
 ## 前置知识
 - 需要完成的前置章节
 
-## 运行步骤
+## 快速开始
 
 ### 1. 编译程序
 \`\`\`bash
@@ -83,11 +82,41 @@ solana program deploy target/deploy/program.so
 \`\`\`
 
 ## 核心概念
-[简要说明，详见CONCEPTS.md]
+
+### [概念1]
+详细讲解，包含文本图示例：
+\`\`\`
+[ASCII图或文本图]
+\`\`\`
+
+### [概念2]
+...
+
+## 数据结构详解
+
+### [结构名称]
+内存布局和字段说明，包含Borsh序列化格式
+
+## 程序流程
+
+### [指令名称]
+处理流程图和详细步骤
+
+## 客户端调用示例
+
+### TypeScript示例
+完整的客户端调用代码，展示如何构建交易和传递数据
+
+### 数据对应关系
+客户端TypeScript数据 ↔ 链上Rust数据的对应表格
 
 ## 常见问题
 Q: ...
 A: ...
+
+## 最佳实践
+- 实践建议1
+- 实践建议2
 ```
 
 ---
@@ -171,7 +200,9 @@ pub fn process_instruction(
 
 ---
 
-## Task 3: 第03节 - 第一个原生程序
+## Task 3: 第03节 - 第一个原生程序 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 创建可以接收和处理数据的程序
@@ -184,6 +215,13 @@ pub fn process_instruction(
 2. 定义指令枚举
 3. 读取和修改账户数据
 4. 所有权检查
+
+**已实现的文档改进：**
+- Counter数据结构的内存布局图
+- 指令处理流程的可视化图表
+- 完整的TypeScript客户端调用示例
+- 客户端数据与链上数据的对应关系表
+- 所有内容整合到单个README.md中
 
 **代码示例：**
 ```rust
@@ -207,7 +245,9 @@ pub struct Counter {
 
 ---
 
-## Task 4: 第04节 - 账户与数据存储
+## Task 4: 第04节 - 账户与数据存储 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 深入理解账户数据存储
@@ -220,6 +260,15 @@ pub struct Counter {
 2. 计算账户所需空间
 3. 转移所有权给程序
 4. 数据序列化最佳实践
+
+**已实现的文档改进：**
+- 两层owner概念的详细图解（Account.owner vs UserProfile.owner）
+- 数据存储位置的可视化说明（Account.data字段）
+- UserProfile结构的内存布局和Borsh序列化格式
+- 完整的TypeScript客户端调用示例
+- 客户端数据与链上数据的对应关系表
+- 所有内容整合到单个README.md中
+- 增强的代码注释说明两层owner验证逻辑
 
 **代码示例：**
 ```rust
@@ -256,7 +305,9 @@ pub fn create_account(
 
 ---
 
-## Task 5: 第05节 - 指令处理
+## Task 5: 第05节 - 指令处理 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 设计复杂的指令结构
@@ -269,6 +320,13 @@ pub fn create_account(
 2. 指令解析和分发
 3. 自定义错误类型
 4. 参数验证
+
+**已实现的文档改进：**
+- TodoList数据结构的内存布局图
+- 复杂指令枚举的Borsh序列化格式详解
+- 每个指令变体的完整TypeScript客户端示例
+- 客户端数据与链上数据的对应关系表
+- 所有内容整合到单个README.md中
 
 **代码示例：**
 ```rust
@@ -294,7 +352,9 @@ pub enum TodoInstruction {
 
 ---
 
-## Task 6: 第06节 - PDA基础
+## Task 6: 第06节 - PDA基础 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 理解PDA（Program Derived Address）概念
@@ -308,11 +368,12 @@ pub enum TodoInstruction {
 3. PDA作为签名者
 4. PDA的实际应用场景
 
-**CONCEPTS.md要点：**
-- 为什么需要PDA
-- PDA如何解决签名问题
-- 与以太坊合约地址的对比
-- PDA的安全性考虑
+**已实现的文档改进：**
+- PDA派生过程的可视化流程图
+- 投票系统架构的完整图解
+- 客户端PDA计算函数示例
+- 客户端数据与链上数据的对应关系表
+- 所有内容整合到单个README.md中
 
 **代码示例：**
 ```rust
@@ -349,7 +410,9 @@ pub fn verify_pda(
 
 ---
 
-## Task 7: 第07节 - CPI基础
+## Task 7: 第07节 - CPI基础 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 理解CPI（Cross-Program Invocation）
@@ -363,11 +426,13 @@ pub fn verify_pda(
 3. invoke_signed与PDA结合
 4. CPI权限和安全性
 
-**CONCEPTS.md要点：**
-- CPI vs 以太坊的合约调用
-- 为什么需要invoke_signed
-- CPI的深度限制
-- 常见的CPI模式
+**已实现的文档改进：**
+- CPI调用流程的可视化图表
+- invoke vs invoke_signed的对比图解
+- 转账记录器系统的完整架构图
+- 完整的TypeScript客户端调用示例
+- 客户端数据与链上数据的对应关系表
+- 所有内容整合到单个README.md中
 
 **代码示例：**
 ```rust
@@ -405,7 +470,9 @@ pub fn transfer_with_pda(
 
 ---
 
-## Task 8: 第08节 - 测试与调试
+## Task 8: 第08节 - 测试与调试 ✅
+
+**状态：** 已完成（包含完整的可视化图表、客户端示例和数据对应关系）
 
 **学习目标：**
 - 掌握solana-program-test框架
@@ -418,6 +485,12 @@ pub fn transfer_with_pda(
 2. BanksClient使用
 3. 测试账户和交易
 4. 日志和错误调试
+
+**已实现的文档改进：**
+- 测试环境结构的可视化图表
+- 完整的测试用例示例
+- 调试技巧和最佳实践
+- 所有内容整合到单个README.md中
 
 **代码示例：**
 ```rust
@@ -485,10 +558,14 @@ async fn test_counter_program() {
 每节完成后检查：
 - [ ] 所有注释都是中文
 - [ ] README.md包含完整的运行步骤
-- [ ] CONCEPTS.md详细讲解核心概念
+- [ ] README.md包含核心概念详解（带可视化图表）
+- [ ] README.md包含完整的客户端调用示例
+- [ ] README.md包含客户端与链上数据的对应关系表
 - [ ] 至少2-3个测试用例
 - [ ] 所有测试通过
 - [ ] 代码可以独立运行
+
+**第03-08节已完成质量检查 ✅**
 
 ---
 
