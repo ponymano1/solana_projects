@@ -230,6 +230,50 @@ Transaction
 └────────────────────────────────────────────┘
 ```
 
+这里有两个 signer，是因为这个交易里包含“创建新账户”这件事：
+
+| signer | 为什么要签名 | 对应授权 |
+|---|---|---|
+| `payer` | 它要出钱 | 同意支付交易费，以及给 `counter_account` 存入租金 |
+| `counter_account` | 它是即将被创建的新账户地址 | 证明客户端确实控制这个新账户地址，同意创建它 |
+
+对应客户端代码通常是：
+
+```typescript
+await sendAndConfirmTransaction(
+  connection,
+  transaction,
+  [payer, counterAccount]
+);
+```
+
+注意：`counter_account` 只是在创建账户时需要签名。账户创建完成后，后续 `Increment` / `Decrement` / `Reset` 不需要 `counter_account` 签名。
+
+```
+创建账户时：
+  payer 签名           = 同意付款
+  counter_account 签名 = 同意创建这个新地址的账户
+
+后续修改数据时：
+  payer 签名           = 支付交易费
+  counter_account 不签名
+```
+
+原因是后续修改 `counter_account.data` 靠的不是 `counter_account` 的私钥，而是 Solana 的账户 owner 规则：
+
+```
+counter_account.owner == counter_program_id
+
+所以 Counter Program 可以修改 counter_account.data。
+```
+
+也就是说：
+
+```
+创建账户权限：靠 payer + counter_account 两个签名
+修改账户 data 权限：靠 Account.owner == 当前 program_id
+```
+
 ### 4.2 第一步：System Program 创建 Counter Account
 
 客户端传给 System Program 的核心数据：
