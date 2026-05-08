@@ -10,6 +10,7 @@
 - [数据结构详解](#数据结构详解)
 - [指令处理流程](#指令处理流程)
 - [客户端调用](#客户端调用)
+- [账户与交互图解](#账户与交互图解)
 - [常见问题](#常见问题)
 
 ---
@@ -457,7 +458,15 @@ todoList.todos.forEach(todo => {
 **注意：**
 - Initialize时owner需要签名（`isSigner: true`）
 - 其他操作时owner也需要签名（权限验证）
-- todo_list_account不需要签名（`isSigner: false`）
+- todo_list_account在Todo程序指令里不需要签名（`isSigner: false`）
+- 如果同一个交易里先用`SystemProgram.createAccount`创建普通Keypair账户，`sendAndConfirmTransaction`的签名者数组仍然需要包含`todoListAccount`，这是为了满足System Program创建账户的要求
+- README里的Borsh TS反序列化示例受`borsh`包版本影响，实际项目中请确认所用版本API
+
+---
+
+## 账户与交互图解
+
+关于第05节用了哪些账户、账户里有哪些数据、客户端每个指令传了什么、链上做了哪些权限校验，请查看：[`ACCOUNT_FLOW.md`](ACCOUNT_FLOW.md)。
 
 ---
 
@@ -560,8 +569,10 @@ let mut todo_list = TodoList::try_from_slice(&data)?;
 │   ├── instruction.rs  # 指令枚举定义
 │   ├── state.rs        # 数据结构
 │   └── error.rs        # 自定义错误类型
-└── tests/
-    └── integration.rs  # 集成测试
+├── tests/
+│   └── integration.rs  # 集成测试
+├── ACCOUNT_FLOW.md     # 账户、交互数据和权限校验图解
+└── README.md
 ```
 
 ---

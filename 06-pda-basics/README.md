@@ -10,6 +10,15 @@
 - ✅ 学会使用invoke_signed创建PDA账户
 - ✅ 掌握客户端如何计算和使用PDA
 
+## 目录
+
+- [学习目标](#学习目标)
+- [快速开始](#快速开始)
+- [核心概念](#核心概念)
+- [客户端调用](#客户端调用)
+- [账户与交互图解](#账户与交互图解)
+- [常见问题](#常见问题)
+
 ## 快速开始
 
 ```bash
@@ -201,6 +210,12 @@ const voteIx = new TransactionInstruction({
 | `findUserVotePDA(...)` | `Pubkey::find_program_address(&[b"user_vote", topic, voter], program_id)` | 计算投票PDA |
 | `topicPDA` | `topic_account` | 投票主题账户 |
 | `userVotePDA` | `user_vote_account` | 用户投票记录 |
+
+---
+
+## 账户与交互图解
+
+关于第06节用了哪些账户、账户里有哪些数据、每个操作客户端传了什么、链上如何校验 PDA 和权限，请查看：[`ACCOUNT_FLOW.md`](ACCOUNT_FLOW.md)。
 
 ---
 
